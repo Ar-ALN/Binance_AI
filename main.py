@@ -1,7 +1,5 @@
 from keras.models import Sequential
-from keras.layers import LSTM, Dense, Dropout, Masking, Embedding
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-
+from keras.layers import LSTM, Dense, Dropout
 import pandas as pd
 
 import matplotlib.pyplot as plt
@@ -20,39 +18,40 @@ values = (values - values.min(0)) / (values.max(0) - values.min(0))
 # plt.plot(ts)
 # plt.show()
 
-data = pd.read_csv("data.csv")
 train_data = values[:-1000]
 test_data = values[-1000:]
 training_dataset_length = len(train_data)
 
 train_data = train_data[0:training_dataset_length, :]
 
-# Splitting the data
-#x_train = []
-#y_train = []
 
-#for i in range(10, len(train_data)):
-    #x_train.append(train_data[i - 10:i, 0])
-    #y_train.append(train_data[i, 0])
+# Splitting the data
+# x_train = []
+# y_train = []
+
+# for i in range(10, len(train_data)):
+# x_train.append(train_data[i - 10:i, 0])
+# y_train.append(train_data[i, 0])
 
 # Convert to numpy arrays
-#x_train, y_train = np.array(x_train), np.array(y_train)
+# x_train, y_train = np.array(x_train), np.array(y_train)
 
 # Reshape the data into 3-D array
-#x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+# x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, time_step=1):
-	dataX, dataY = [], []
-	for i in range(len(dataset)-time_step-1):
-		a = dataset[i:(i+time_step), 0]   ###i=0, 0,1,2,3-----99   100 
-		dataX.append(a)
-		dataY.append(dataset[i + time_step, 0])
-	return numpy.array(dataX), numpy.array(dataY)
+    dataX, dataY = [], []
+    for i in range(len(dataset) - time_step - 1):
+        a = dataset[i:(i + time_step), 0]
+        dataX.append(a)
+        dataY.append(dataset[i + time_step, 0])
+    return np.array(dataX), np.array(dataY)
+
 
 # reshape into X=t,t+1,t+2,t+3 and Y=t+4
 time_step = 100
-x_train, y_train = create_dataset(train_data, time_step) 
+x_train, y_train = create_dataset(train_data, time_step)
 
 # Now perform exponential moving average smoothing
 # So the data will have a smoother curve than the original ragged data

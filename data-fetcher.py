@@ -1,8 +1,8 @@
 import csv
+import os
 from binance import Client
 
-client = Client('TniMYW80Nz5VRK9v0xkIHMTcIKajsFXBzkNZLKEgsuANdITibck2NwKCfGEsE7sG',
-                'cHnla50KhvEagVRcvyGgvxs541GrNFfjDdgrm3lN1k7hRocniDk391VzlLeE6P3D')
+client = Client(os.environ['API_KEY'], os.environ['API_SECRET'])
 
 klines = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_1MINUTE, "1 month ago UTC")
 
