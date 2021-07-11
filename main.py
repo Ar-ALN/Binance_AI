@@ -11,6 +11,8 @@ data = pd.read_csv("data.csv", header=None)
 data = data.drop(columns=[11])
 
 values = data.values
+
+#met tout entre 0 et 1
 values = (values - values.min(0)) / (values.max(0) - values.min(0))
 
 # ts = pd.Series(values[:, 1])
@@ -24,6 +26,8 @@ training_dataset_length = len(train_data)
 
 train_data = train_data[0:training_dataset_length, :]
 
+train_data = train_data[0:]
+test_data = test_data[0:]
 
 # Splitting the data
 # x_train = []
@@ -52,6 +56,7 @@ def create_dataset(dataset, time_step=1):
 # reshape into X=t,t+1,t+2,t+3 and Y=t+4
 time_step = 100
 x_train, y_train = create_dataset(train_data, time_step)
+x_test, y_test = create_dataset(test_data, time_step)
 
 # Now perform exponential moving average smoothing
 # So the data will have a smoother curve than the original ragged data
@@ -64,10 +69,14 @@ for ti in range(11000):
 # Used for visualization and test purposes
 all_mid_data = np.concatenate([train_data, test_data], axis=0)
 
+# reshape le tout
+x_train =x_train.reshape(x_train.shape[0],x_train.shape[1] , 1)
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1] , 1)
+
 # Initialising the RNN
 model = Sequential()
 
-model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(LSTM(units=50, return_sequences=True, input_shape=(100, 1)))
 model.add(Dropout(0.2))
 
 # Adding a second LSTM layer and Dropout layer
@@ -91,7 +100,7 @@ model.add(Dense(units=1))
 # ModelCheckpoint('../models/model.h5'), save_best_only=True,
 # save_weights_only=False)]
 model.compile(optimizer='adam', loss='mean_squared_error')
-history = model.fit(x_train, y_train,
+model.fit(x_train, y_train,validation_data=(x_test,y_test),
                     batch_size=2048, epochs=150,
 
                     )
@@ -120,3 +129,4 @@ predictions = scaler.inverse_transform(predictions)
 # Calculate RMSE score
 rmse = np.sqrt(np.mean(((predictions - y_test) ** 2)))
 rmse
+
