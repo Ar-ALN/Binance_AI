@@ -10,22 +10,24 @@ import numpy as np
 plt.close("all")
 
 data = pd.read_csv("data.csv", header=None)
-data = data.drop(columns=[11])
-
-values = data.values
+#data = data.drop(columns=[4])
+print(data)
+values = data[[4]]
+print(values)
 
 scaler=MinMaxScaler(feature_range=(0,1))
 
 #met tout entre 0 et 1
 values = scaler.fit_transform(np.array(values).reshape(-1,1))
 
+
 # ts = pd.Series(values[:, 1])
 # plt.figure()
 # plt.plot(ts)
 # plt.show()
 
-train_data = values[:-1000]
-test_data = values[-1000:]
+train_data = values[:-10000]
+test_data = values[-10000:]
 training_dataset_length = len(train_data)
 
 train_data = train_data[0:training_dataset_length, :]
@@ -76,6 +78,9 @@ all_mid_data = np.concatenate([train_data, test_data], axis=0)
 # reshape le tout
 x_train =x_train.reshape(x_train.shape[0],x_train.shape[1] , 1)
 x_test = x_test.reshape(x_test.shape[0],x_test.shape[1] , 1)
+print(x_train.shape)
+print(y_train.shape)
+print(x_test.shape)
 
 # Initialising the RNN
 model = Sequential()
@@ -103,11 +108,13 @@ model.add(Dense(units=1))
 # callbacks = [EarlyStopping(monitor='val_loss', patience=5),
 # ModelCheckpoint('../models/model.h5'), save_best_only=True,
 # save_weights_only=False)]
-model.compile(optimizer='adam', loss='mean_squared_error')
+model.compile(optimizer='adam', loss='mean_squared_error',metrics=['accuracy'])
 model.fit(x_train, y_train,validation_data=(x_test,y_test),
-                    batch_size=64, epochs=1, verbose = 1
+                    batch_size=64, epochs=100, verbose = 1
 
                     )
+model.save("model.h5")
+print("Saved model to disk")
 
 ### Lets Do the prediction and check performance metrics
 train_predict=model.predict(x_train)
@@ -116,12 +123,6 @@ test_predict=model.predict(x_test)
 ### Calculate RMSE performance metrics
 import math
 from sklearn.metrics import mean_squared_error
-from sklearn import preprocessing
-from sklearn.preprocessing import StandardScaler
-
-math.sqrt(mean_squared_error(y_train,train_predict))
-
-
 
 
 ##Transformback to original form
@@ -129,21 +130,24 @@ train_predict=scaler.inverse_transform(train_predict)
 test_predict=scaler.inverse_transform(test_predict)
 
 
+math.sqrt(mean_squared_error(y_train,train_predict))
 ### Test Data RMSE
-math.sqrt(mean_squared_error(ytest,test_predict))
+math.sqrt(mean_squared_error(y_test,test_predict))
 
 ### Plotting
 # shift train predictions for plotting
 look_back=100
-trainPredictPlot = numpy.empty_like(test_data)
+trainPredictPlot = np.empty_like(values)
 trainPredictPlot[:, :] = np.nan
 trainPredictPlot[look_back:len(train_predict)+look_back, :] = train_predict
 # shift test predictions for plotting
-testPredictPlot = numpy.empty_like(test_data)
-testPredictPlot[:, :] = numpy.nan
-testPredictPlot[len(train_predict)+(look_back*2)+1:len(test_data)-1, :] = test_predict
+testPredictPlot = np.empty_like(values)
+testPredictPlot[:, :] = np.nan
+testPredictPlot[len(train_predict)+(look_back*2)+1:len(values)-1, :] = test_predict
 # plot baseline and predictions
-plt.plot(scaler.inverse_transform(test_data))
+plt.plot(scaler.inverse_transform(values))
 plt.plot(trainPredictPlot)
 plt.plot(testPredictPlot)
 plt.show()
+
+s
