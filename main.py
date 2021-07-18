@@ -5,6 +5,8 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 import numpy as np
+import math
+from sklearn.metrics import mean_squared_error
 
 
 plt.close("all")
@@ -82,71 +84,97 @@ print(x_train.shape)
 print(y_train.shape)
 print(x_test.shape)
 
-# Initialising the RNN
-model = Sequential()
+def deep_network_LSTM(name_model,x_train, y_train, activation_function = 'sigmoid', opt = 'adam', epochs = 100, batch_size = 64):
+    # Initialising the RNN
+    model = Sequential()
 
-model.add(LSTM(units=50, return_sequences=True, input_shape=(100, 1)))
-model.add(Dropout(0.2))
+    model.add(LSTM(units=50, return_sequences=True, input_shape=(100, 1)))
+    model.add(Dropout(0.2))
 
-# Adding a second LSTM layer and Dropout layer
-model.add(LSTM(units=50, return_sequences=True))
-model.add(Dropout(0.2))
+    # Adding a second LSTM layer and Dropout layer
+    model.add(LSTM(units=50, return_sequences=True))
+    model.add(Dropout(0.2))
 
-# Adding a third LSTM layer and Dropout layer
-model.add(LSTM(units=50, return_sequences=True))
-model.add(Dropout(0.2))
+    # Adding a third LSTM layer and Dropout layer
+    model.add(LSTM(units=50, return_sequences=True))
+    model.add(Dropout(0.2))
 
-# Adding a fourth LSTM layer and and Dropout layer
-model.add(LSTM(units=50))
-model.add(Dropout(0.2))
+    # Adding a fourth LSTM layer and and Dropout layer
+    model.add(LSTM(units=50))
+    model.add(Dropout(0.2))
 
-# Adding the output layer
-# For Full connection layer we use dense
-# As the output is 1D so we use unit=1
-model.add(Dense(units=1))
-# Create callbacks
-# callbacks = [EarlyStopping(monitor='val_loss', patience=5),
-# ModelCheckpoint('../models/model.h5'), save_best_only=True,
-# save_weights_only=False)]
-model.compile(optimizer='adam', loss='mean_squared_error',metrics=['accuracy'])
-model.fit(x_train, y_train,validation_data=(x_test,y_test),
-                    batch_size=64, epochs=100, verbose = 1
+    # Adding the output layer
+    # For Full connection layer we use dense
+    # As the output is 1D so we use unit=1
+    model.add(Dense(units=1))
+    # Create callbacks
+    # callbacks = [EarlyStopping(monitor='val_loss', patience=5),
+    # ModelCheckpoint('../models/model.h5'), save_best_only=True,
+    # save_weights_only=False)]
+    model.compile(optimizer= opt, loss='mean_squared_error',metrics=['accuracy'])
+    history =model.fit(x_train, y_train,validation_data=(x_test,y_test),
+                        batch_size=batch_size, epochs=epochs, verbose = 1
 
-                    )
-model.save("model.h5")
-print("Saved model to disk")
+                        )
+    model.save(name_model)
+    print("Saved model to disk")
 
-### Lets Do the prediction and check performance metrics
-train_predict=model.predict(x_train)
-test_predict=model.predict(x_test)
+    return(history)
 
-### Calculate RMSE performance metrics
-import math
-from sklearn.metrics import mean_squared_error
+def prediction_model_plot(model,x_train,x_test, values):
+    ### Lets Do the prediction and check performance metrics
+    train_predict = model.predict(x_train)
+    test_predict = model.predict(x_test)
+    ##Transformback to original form
+    train_predict = scaler.inverse_transform(train_predict)
+    test_predict = scaler.inverse_transform(test_predict)
+
+    math.sqrt(mean_squared_error(y_train, train_predict))
+    ### Test Data RMSE
+    math.sqrt(mean_squared_error(y_test, test_predict))
+
+    ### Plotting
+    # shift train predictions for plotting
+    look_back = 100
+    trainPredictPlot = np.empty_like(values)
+    trainPredictPlot[:, :] = np.nan
+    trainPredictPlot[look_back:len(train_predict) + look_back, :] = train_predict
+    # shift test predictions for plotting
+    testPredictPlot = np.empty_like(values)
+    testPredictPlot[:, :] = np.nan
+    testPredictPlot[len(train_predict) + (look_back * 2) + 1:len(values) - 1, :] = test_predict
+    # plot baseline and predictions
+    plt.plot(scaler.inverse_transform(values))
+    plt.plot(trainPredictPlot)
+    plt.plot(testPredictPlot)
+    plt.show()
+
+def plot_hp(model_plot,hyperparameter):
+
+    train_hp = hyperparameter
+    validation_hp = 'val_' + hyperparameter
+    model = model_plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(model.history[train_hp], label='train')
+    plt.plot(model.history[validation_hp], alpha=0.7, label='validation')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.title('Loss vs Epochs for Model 1', size=25)
+    plt.grid()
+
+model1 = deep_network_LSTM('model1',x_train, y_train,epochs=1)
+plot_hp(model1,'loss')
+plot_hp(model1,'accuracy')
+prediction1 = prediction_model_plot(model1,x_train,x_test, values)
 
 
-##Transformback to original form
-train_predict=scaler.inverse_transform(train_predict)
-test_predict=scaler.inverse_transform(test_predict)
 
 
-math.sqrt(mean_squared_error(y_train,train_predict))
-### Test Data RMSE
-math.sqrt(mean_squared_error(y_test,test_predict))
 
-### Plotting
-# shift train predictions for plotting
-look_back=100
-trainPredictPlot = np.empty_like(values)
-trainPredictPlot[:, :] = np.nan
-trainPredictPlot[look_back:len(train_predict)+look_back, :] = train_predict
-# shift test predictions for plotting
-testPredictPlot = np.empty_like(values)
-testPredictPlot[:, :] = np.nan
-testPredictPlot[len(train_predict)+(look_back*2)+1:len(values)-1, :] = test_predict
-# plot baseline and predictions
-plt.plot(scaler.inverse_transform(values))
-plt.plot(trainPredictPlot)
-plt.plot(testPredictPlot)
-plt.show()
+
+
+
+
+
 
