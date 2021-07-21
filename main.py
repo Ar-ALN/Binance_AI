@@ -28,7 +28,8 @@ train_data = values[:-10000]
 test_data = values[-10000:]
 training_dataset_length = len(train_data)
 
-# train_data = train_data[0:training_dataset_length, :]
+# test_data = train_data[0:training_dataset_length, :]
+# test_data = train_data[0:training_dataset_length, :]
 
 # Used for visualization and test purposes
 all_mid_data = np.concatenate([train_data, test_data], axis=0)
@@ -55,25 +56,14 @@ def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, shape, activ
                       epochs=100, batch_size=64):
     # Initialising the RNN
     model = Sequential()
-
     model.add(LSTM(units=50, return_sequences=True, input_shape=(shape, 1)))
     model.add(Dropout(0.2))
-
-    # Adding a second LSTM layer and Dropout layer
     model.add(LSTM(units=50, return_sequences=True))
     model.add(Dropout(0.2))
-
-    # Adding a third LSTM layer and Dropout layer
     model.add(LSTM(units=50, return_sequences=True))
     model.add(Dropout(0.2))
-
-    # Adding a fourth LSTM layer and and Dropout layer
     model.add(LSTM(units=50))
     model.add(Dropout(0.2))
-
-    # Adding the output layer
-    # For Full connection layer we use dense
-    # As the output is 1D so we use unit=1
     model.add(Dense(units=1))
     # Create callbacks
     # callbacks = [EarlyStopping(monitor='val_loss', patience=5),
@@ -81,31 +71,37 @@ def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, shape, activ
     # save_weights_only=False)]
     model.compile(optimizer=opt, loss='mean_squared_error', metrics=['accuracy'])
     history = model.fit(x_train, y_train, validation_data=(x_test, y_test),
-                        batch_size=batch_size, epochs=epochs, verbose=1
-
-                        )
+                        batch_size=batch_size, epochs=epochs, verbose=1)
     # model.save(name_model)
     # print("Saved model to disk")
 
     return (model, history)
 
 
-def prediction_model_plot(model, x_train, y_train, x_test, y_test, values, look_back, x_min=39400, x_max=39500,
-                          y_min=32000, y_max=37000):
+def prediction_model_plot(model, x_train, y_train, x_test, y_test, values, look_back):
+    global originalValues
+
     ### Lets Do the prediction and check performance metrics
     train_predict = model.predict(x_train)
     test_predict = model.predict(x_test)
+
     ##Transformback to original form
     math.sqrt(mean_squared_error(y_train, train_predict))
+
     ### Test Data RMSE
     math.sqrt(mean_squared_error(y_test, test_predict))
 
     ### Plotting
     # shift train predictions for plotting
+    # values = np.reshape(values, (len(values), 1))
+    values = np.reshape(originalValues, (len(originalValues), 1))
+    print(values.shape)
+    x = np.arange(len(values))
+    print(x)
 
     trainPredictPlot = np.empty_like(values)
-    trainPredictPlot[:, :] = np.nan
-    trainPredictPlot[look_back:len(train_predict) + look_back, :] = train_predict
+    trainPredictPlot[:] = np.nan
+    trainPredictPlot[look_back:len(train_predict) + look_back] = train_predict
     # shift test predictions for plotting
     testPredictPlot = np.empty_like(values)
     testPredictPlot[:] = np.nan
@@ -173,21 +169,3 @@ model1, history1 = deep_network_LSTM('model1', x_train1, y_train1, x_test1, y_te
 plot_hp(history1, 'loss')
 plot_hp(history1, 'accuracy')
 prediction1 = prediction_model_plot(model1, x_train1, y_train1, x_test1, y_test1, values, look_back=time_step1)
-
-# ### Ici Model 2
-# print('model 2')
-# time_step2 = 100
-# x_train2, y_train2, x_test2, y_test2 = reshape_data(time_step2, train_data, test_data)
-# model2, history2 = deep_network_LSTM('model2', x_train2, y_train2, x_test2, y_test2, time_step2, epochs=4)
-# plot_hp(history2, 'loss')
-# plot_hp(history2, 'accuracy')
-# prediction2 = prediction_model_plot(model2, x_train2, y_train2, x_test2, y_test2, values, look_back=time_step2)
-#
-# ### Ici Model 3
-# print('model 3')
-# time_step3 = 100
-# x_train3, y_train3, x_test3, y_test3 = reshape_data(time_step3, train_data, test_data)
-# model3, history3 = deep_network_LSTM('model3', x_train3, y_train3, x_test3, y_test3, time_step3, epochs=4)
-# plot_hp(history3, 'loss')
-# plot_hp(history3, 'accuracy')
-# prediction3 = prediction_model_plot(model3, x_train3, y_train3, x_test3, y_test3, values, look_back=time_step3)
