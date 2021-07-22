@@ -8,6 +8,10 @@ import numpy as np
 import math
 from sklearn.metrics import mean_squared_error
 
+from dataloader import get_data
+
+data, x_train, y_train, x_test, y_test = get_data()
+
 plt.close("all")
 
 data = pd.read_csv("data.csv", header=None)
