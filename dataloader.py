@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def get_data(ratio=.9, time_step=100, prediction_forecast=50):
+def prepare_data(ratio=.9, time_step=100, prediction_forecast=50):
     data = pd.read_csv("data.csv", header=None)
     relative_candles = []
     for i in range(1, len(data)):
@@ -11,13 +11,13 @@ def get_data(ratio=.9, time_step=100, prediction_forecast=50):
     useful_data_length = len(data) - time_step - prediction_forecast
 
     dataX, dataY = [], []
-    for i in range(time_step, useful_data_length):
+    for i in range(time_step, time_step + useful_data_length):
         dataX.append(relative_candles[i - time_step:i])
 
-        max_price = data[4][i: i + prediction_forecast].max()
+        avg_price = data[4][i: i + prediction_forecast].mean()
         current_price = data[4][i]
-        prediction = 1 if max_price > current_price else 0
-        prediction = .5 if current_price * 1.006 > max_price > current_price * 0.994 else prediction
+        prediction = 1 if avg_price > current_price else 0
+        prediction = .5 if current_price * 1.003 > avg_price > current_price * 0.997 else prediction
         dataY.append(prediction)
 
     train_data_length = int(useful_data_length * ratio)

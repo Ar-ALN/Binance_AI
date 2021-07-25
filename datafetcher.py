@@ -5,7 +5,7 @@ from binance import Client
 client = Client(os.environ['API_KEY'], os.environ['API_SECRET'])
 
 print("Fetching data...")
-klines = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_1MINUTE, "1 month ago UTC")
+klines = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_1MINUTE, "1 year ago UTC")
 
 print("Writing to file...")
 with open('data.csv', 'w', newline='') as csvfile:
