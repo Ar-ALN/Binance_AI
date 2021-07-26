@@ -9,23 +9,25 @@ from sklearn.metrics import mean_squared_error
 
 from dataloader import prepare_data
 
-time_step = 100
+time_step = 600
 
-data, x_train, y_train, x_test, y_test = prepare_data(time_step=time_step, prediction_forecast=40)
+data, x_train, y_train, x_test, y_test = prepare_data(time_step=time_step, prediction_forecast=30, subset=None)
 
 plt.close("all")
 
 
-def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, shape, activation_function='sigmoid', opt='adam',
-                      epochs=100, batch_size=2048):
+def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, input_shape, activation_function='sigmoid', opt='adam',
+                      epochs=100, batch_size=1024):
     model = Sequential()
-    model.add(LSTM(units=50, return_sequences=True, input_shape=(shape, 1)))
+    model.add(LSTM(units=50, return_sequences=True, input_shape=input_shape))
     model.add(Dropout(0.1))
     model.add(LSTM(units=50, return_sequences=True))
     model.add(Dropout(0.1))
-    model.add(LSTM(units=50, return_sequences=True))
+    model.add(LSTM(units=85, return_sequences=True))
     model.add(Dropout(0.1))
-    model.add(LSTM(units=50))
+    model.add(LSTM(units=35, return_sequences=True))
+    model.add(Dropout(0.1))
+    model.add(LSTM(units=10))
     model.add(Dropout(0.1))
     model.add(Dense(units=1))
     # Create callbacks
@@ -45,13 +47,13 @@ def prediction_model_plot(model, x_train, y_train, x_test, y_test, data, time_st
     train_predict = model.predict(x_train)
     test_predict = model.predict(x_test)
 
-    x = np.arange(len(data[4]))
+    x = np.arange(len(data["close"]))
 
-    train_predict_plot = np.empty_like(data[4])
+    train_predict_plot = np.empty_like(data["close"])
     train_predict_plot[:] = np.nan
     train_predict_plot[time_step:len(train_predict) + time_step] = train_predict.reshape(train_predict.shape[0])
 
-    test_predict_plot = np.empty_like(data[4])
+    test_predict_plot = np.empty_like(data["close"])
     test_predict_plot[:] = np.nan
     test_predict_plot[time_step + len(train_predict): time_step + len(train_predict) + len(test_predict)] = test_predict.reshape(test_predict.shape[0])
     fig = plt.figure(figsize=(12, 1), dpi=1200)
@@ -86,7 +88,7 @@ def plot_hp(model_plot, hyperparameter):
     plt.show()
 
 
-model1, history1 = deep_network_LSTM('model1', x_train, y_train, x_test, y_test, time_step, epochs=3)
+model1, history1 = deep_network_LSTM('model1', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=140)
 plot_hp(history1, 'loss')
 plot_hp(history1, 'accuracy')
 prediction_model_plot(model1, x_train, y_train, x_test, y_test, data, time_step=time_step)
