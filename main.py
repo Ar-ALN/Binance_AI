@@ -17,7 +17,7 @@ plt.close("all")
 
 
 def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, input_shape, activation_function='sigmoid', opt='adam',
-                      epochs=100, batch_size=1024):
+                      epochs=100, batch_size=254):
     model = Sequential()
     model.add(LSTM(units=50, return_sequences=True, input_shape=input_shape))
     model.add(Dropout(0.1))
@@ -86,7 +86,7 @@ def plot_hp(model_plot, hyperparameter):
     plt.show()
 
 
-model, history = deep_network_LSTM('model', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=1200)
+model, history = deep_network_LSTM('model', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=50)
 plot_hp(history, 'loss')
 plot_hp(history, 'accuracy')
 prediction_model_plot(model, x_train, y_train, x_test, y_test, data, time_step=time_step)
