@@ -121,13 +121,13 @@ def prediction_model_plot(model, x_train, y_train, x_test, y_test, values, look_
     axe3 = axe1.twinx()
     axe3.set_ylabel('testPredictPlot')
     axe3.hist(testPredictPlot, 100, edgecolor="k", color='green')
-    # plt.plot(trainPredictPlot, linewidth=0.033333)
-    # plt.plot(testPredictPlot, linewidth=0.033333)
-    # plt.axis([x_min, x_max, y_min, y_max])  # permet de zoomer sur une partie de la courbe
+    plt.plot(trainPredictPlot, linewidth=0.033333)
+    plt.plot(testPredictPlot, linewidth=0.033333)
+    plt.axis([x_min, x_max, y_min, y_max])  # permet de zoomer sur une partie de la courbe
     plt.show()
 
 
-def plot_hp(model_plot, hyperparameter):
+def plot_hp(model_plot, hyperparameter,name_model):
     train_hp = hyperparameter
     validation_hp = 'val_' + hyperparameter
     model = model_plot
@@ -137,7 +137,7 @@ def plot_hp(model_plot, hyperparameter):
     plt.xlabel(hyperparameter)
     plt.ylabel('Loss')
     plt.legend()
-    plt.title(hyperparameter + ' vs Epochs for Model 1', size=25)
+    plt.title(hyperparameter + ' vs Epochs for ' + name_model, size=25)
     plt.grid()
     plt.show()
 
@@ -165,7 +165,7 @@ def reshape_data(time_step, train_data, test_data):
 print('model 1')
 time_step1 = 200
 x_train1, y_train1, x_test1, y_test1 = reshape_data(time_step1, train_data, test_data)
-model1, history1 = deep_network_LSTM('model1', x_train1, y_train1, x_test1, y_test1, time_step1, epochs=1)
-plot_hp(history1, 'loss')
-plot_hp(history1, 'accuracy')
+model1, history1 = deep_network_LSTM('model1', x_train1, y_train1, x_test1, y_test1, time_step1, epochs=50)
+plot_hp(history1, 'loss','Model 1')
+plot_hp(history1, 'accuracy','Model 1')
 prediction1 = prediction_model_plot(model1, x_train1, y_train1, x_test1, y_test1, values, look_back=time_step1)
