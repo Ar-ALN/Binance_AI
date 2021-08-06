@@ -1,5 +1,6 @@
-from keras.models import Sequential
-from keras.layers import LSTM, Dense, Dropout
+import tensorflow as tf
+from tf.keras.models import Sequential
+from tf.keras.layers import LSTM, Dense, Dropout
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
@@ -19,6 +20,9 @@ import chainer.links as L
 from plotly import tools
 from plotly.graph_objs import *
 from plotly.offline import init_notebook_mode, iplot, iplot_mpl
+
+
+print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 plt.close("all")
 
