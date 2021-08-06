@@ -40,8 +40,8 @@ originalValues = originalValues[:len(originalValues) - 1]
 # plt.plot(ts)
 # plt.show()
 
-train_data = values[:-10000]
-test_data = values[-10000:]
+train_data = data[:-10000]
+test_data = data[-10000:]
 training_dataset_length = len(train_data)
 
 # test_data = train_data[0:training_dataset_length, :]
@@ -83,7 +83,7 @@ class Environment:
 
         #actions = 0: stay, 1: buy, 2: sell
         if act == 1: # if he buy
-            self.positions.append(self.data.iloc[self.t, :]['Close']) # Fill the list 'positions' with the actual stock price (we just bought)
+            self.positions.append(self.data.iloc[self.t, :][4]) # Fill the list 'positions' with the actual stock price (we just bought)
 
         elif act == 2: # if he sells
             if len(self.positions) == 0:
@@ -91,17 +91,17 @@ class Environment:
             else:
                 profits = 0 # initialize profits (not the same as self.profits)
                 for p in self.positions: # iterate through self.positions
-                    profits += profits + self.data.iloc[self.t, :]['Close'] - p # define the profits equal to diff between actual stock price and the positions price we have bought
-                rewards += profits # the reward the agent gain is equal to the profits we have made
+                    profits += profits + self.data.iloc[self.t, :][4] - p # define the profits equal to diff between actual stock price and the positions price we have bought
+                reward += profits # the reward the agent gain is equal to the profits we have made
                 self.profits += profits # save the profits into self.profits
                 self.positions = [] # reset self.positions because we sold all
 
         self.t += 1 # Go for the next price stock
         self.position_value = 0
         for p in self.positions: # iterate through self.positions
-            self.position_value += (self.data.iloc[self.t, :]['Close'] - p) # if we still have positions (we didn't sell in this iteration) we save the profits we have with into positions_value
+            self.position_value += (self.data.iloc[self.t, :][4] - p) # if we still have positions (we didn't sell in this iteration) we save the profits we have with into positions_value
         self.history.pop(0)
-        self.history.append(self.data.iloc[self.t, :]['Close'] - self.data.iloc[(self.t - 1), :]['Close'])
+        self.history.append(self.data.iloc[self.t, :][4] - self.data.iloc[(self.t - 1), :][4])
 
         # positive reward if we have made benefits, negative if not
         if reward > 0:
@@ -402,3 +402,10 @@ def reshape_data(time_step, train_data, test_data):
 Q, total_losses, total_rewards = train_dddqn(Environment(train_data))
 plot_loss_reward(total_losses, total_rewards)
 #plot_train_test_by_q(Environment1(train), Environment1(test), Q, 'Dueling Double DQN')
+
+"""
+model1, history1 = deep_network_LSTM('model1', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=140)
+plot_hp(history1, 'loss')
+plot_hp(history1, 'accuracy')
+prediction_model_plot(model1, x_train, y_train, x_test, y_test, data, time_step=time_step)
+"""

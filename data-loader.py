@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 plt.close("all")
 
-data = pd.read_csv("data.csv", header=None)
+data = pd.read_csv("data.csv")
 data = data.drop(columns=[11])
 
 values = data.values
