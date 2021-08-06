@@ -1,6 +1,6 @@
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
@@ -179,7 +179,7 @@ with tf.device('/GPU:0'):
         epoch_num = 50
         step_max = len(env.data) - 1
         memory_size = 200
-        batch_size = 50
+        batch_size = 32
         epsilon = 1.0
         epsilon_decrease = 1e-3
         epsilon_min = 0.1
