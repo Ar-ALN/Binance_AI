@@ -213,12 +213,12 @@ def train_dddqn(env):
     epoch_num = 50
     step_max = len(env.data) - 1
     memory_size = 200
-    batch_size = 200
+    batch_size = 50
     epsilon = 1.0
     epsilon_decrease = 1e-4
     epsilon_min = 0.1
     start_reduce_epsilon = 100
-    train_freq = 10
+    train_freq = 20
     update_q_freq = 20
     gamma = 0.97
     show_log_freq = 5
