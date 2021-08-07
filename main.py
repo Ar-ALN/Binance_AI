@@ -45,7 +45,7 @@ originalValues = originalValues[:len(originalValues) - 1]
 # plt.plot(ts)
 # plt.show()
 
-train_data = data[:-44000]
+train_data = data[:-44200]
 test_data = data[-10000:]
 training_dataset_length = len(train_data)
 
@@ -212,7 +212,7 @@ def train_dddqn(env):
 
     epoch_num = 50
     step_max = len(env.data) - 1
-    memory_size = 300
+    memory_size = 200
     batch_size = 50
     epsilon = 1.0
     epsilon_decrease = 1e-3
