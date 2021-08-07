@@ -44,7 +44,7 @@ originalValues = originalValues[:len(originalValues) - 1]
 # plt.plot(ts)
 # plt.show()
 
-train_data = data[:-42000]
+train_data = data[:-43000]
 test_data = data[-10000:]
 training_dataset_length = len(train_data)
 
@@ -216,7 +216,7 @@ def train_dddqn(env):
     epsilon = 1.0
     epsilon_decrease = 1e-3
     epsilon_min = 0.1
-    start_reduce_epsilon = 1000
+    start_reduce_epsilon = 200
     train_freq = 10
     update_q_freq = 20
     gamma = 0.97
