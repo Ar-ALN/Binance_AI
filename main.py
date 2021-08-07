@@ -28,6 +28,7 @@ plt.close("all")
 
 data = pd.read_csv("data.csv")
 data.head()
+print(len(data))
 values = []
 
 """
