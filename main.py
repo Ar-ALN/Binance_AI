@@ -219,7 +219,7 @@ def train_dddqn(env):
     epsilon_min = 0.1
     start_reduce_epsilon = 100
     train_freq = 10
-    update_q_freq = 20
+    update_q_freq = 30
     gamma = 0.97
     show_log_freq = 5
 
