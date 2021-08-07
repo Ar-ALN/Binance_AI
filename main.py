@@ -45,7 +45,7 @@ originalValues = originalValues[:len(originalValues) - 1]
 # plt.plot(ts)
 # plt.show()
 
-train_data = data[:-43000]
+train_data = data[:-44000]
 test_data = data[-10000:]
 training_dataset_length = len(train_data)
 
