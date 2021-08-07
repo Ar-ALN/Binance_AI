@@ -216,7 +216,7 @@ def train_dddqn(env):
     batch_size = 50
     epsilon = 1.0
     epsilon_decrease = 1e-4
-    epsilon_min = 0.05
+    epsilon_min = 0.2
     start_reduce_epsilon = 100
     train_freq = 10
     update_q_freq = 20
