@@ -78,7 +78,7 @@ def plot_hp(model_plot, hyperparameter):
     plt.show()
 
 
-model, history = deep_network_LSTM('model', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=1200)
+model, history = deep_network_LSTM('model', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=100)
 plot_hp(history, 'loss')
 plot_hp(history, 'accuracy')
 prediction_model_plot(model, x_train, y_train, x_test, y_test, data, time_step=time_step)
