@@ -57,7 +57,7 @@ print(len(data))
 values = []
 
 """
-originalValues = data[4].to_numpy()
+originalValues = data['Close'].to_numpy()
 values = []
 for i in range(len(data) - 1):
     values.append(((originalValues[i] / originalValues[i + 1]) - 1) * 10)
@@ -70,7 +70,7 @@ originalValues = originalValues[:len(originalValues) - 1]
 # plt.plot(ts)
 # plt.show()
 data_split = '2020-01-01'
-train_data = data[:-43920]
+train_data = data[:-10000]
 test_data = data[-10000:]
 training_dataset_length = len(train_data)
 
@@ -496,13 +496,15 @@ def reshape_data(time_step, train_data, test_data):
 ### Ici Model 1
 
 with tf.device('/GPU:0'):
+
     Q, total_losses, total_rewards = train_dddqn(Environment(train_data))
     plot_loss_reward(total_losses, total_rewards)
     #plot_train_test_by_q(Environment1(train), Environment1(test), Q, 'Dueling Double DQN')
 
-"""
-model1, history1 = deep_network_LSTM('model1', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=140)
-plot_hp(history1, 'loss')
-plot_hp(history1, 'accuracy')
-prediction_model_plot(model1, x_train, y_train, x_test, y_test, data, time_step=time_step)
-"""
+
+    """
+    model1, history1 = deep_network_LSTM('model1', x_train, y_train, x_test, y_test, x_train[0].shape, epochs=140)
+    plot_hp(history1, 'loss')
+    plot_hp(history1, 'accuracy')
+    prediction_model_plot(model1, x_train, y_train, x_test, y_test, data, time_step=time_step)
+    """
