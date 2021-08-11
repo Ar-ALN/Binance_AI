@@ -202,12 +202,12 @@ def train_dddqn(env):
 
         def __init__(self, input_size, hidden_size, output_size):
             super(Q_Network, self).__init__(
-                fc1=L.LSTM(input_size, hidden_size),
-                fc2=L.LSTM(hidden_size, hidden_size),
-                fc3=L.LSTM(hidden_size, hidden_size // 2),
-                fc4=L.LSTM(hidden_size, hidden_size // 2),
-                state_value=L.Linear(hidden_size // 2, 1),
-                advantage_value=L.Linear(hidden_size // 2, output_size)
+                fc1=L.Linear(input_size, hidden_size),
+                fc2=L.Linear(hidden_size, hidden_size),
+                fc3=L.Linear(hidden_size, hidden_size // 2),
+                fc4=L.Linear(hidden_size, hidden_size // 2),
+                state_value=L.LSTM(hidden_size // 2, 1),
+                advantage_value=L.LSTM(hidden_size // 2, output_size)
             )
             self.input_size = input_size
             self.hidden_size = hidden_size
