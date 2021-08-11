@@ -25,10 +25,6 @@ def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, input_shape,
     model.add(Dropout(0.3))
     model.add(Dense(32, kernel_initializer="uniform", activation='relu'))
     model.add(Dense(1, kernel_initializer="uniform", activation='linear'))
-    # Create callbacks
-    # callbacks = [EarlyStopping(monitor='val_loss', patience=5),
-    # ModelCheckpoint('../models/model.h5'), save_best_only=True,
-    # save_weights_only=False)]
     model.compile(optimizer=opt, loss='mae', metrics=['accuracy'])
     history = model.fit(x_train, y_train, validation_data=(x_test, y_test),
                         batch_size=batch_size, epochs=epochs, verbose=1)
