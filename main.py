@@ -20,6 +20,13 @@ import chainer.links as L
 from plotly import tools
 from plotly.graph_objs import *
 from plotly.offline import init_notebook_mode, iplot, iplot_mpl
+"""
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+"""
+
 
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
@@ -27,7 +34,25 @@ print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 plt.close("all")
 
 data = pd.read_csv("data.csv")
+data.columns = [
+        "datetime",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+
+        "Close time",
+        "Quote asset volume",
+        "Number of trades",
+        "Taker buy base asset volume",
+        "Taker buy quote asset volume",
+        "Ignore"
+    ]
+data['datetime'] = pd.to_datetime(data['datetime'])
+data = data.set_index('datetime')
 data.head()
+print("///////////////",data.index.min(), data.index.max())
 print(len(data))
 values = []
 
@@ -44,8 +69,8 @@ originalValues = originalValues[:len(originalValues) - 1]
 # plt.figure()
 # plt.plot(ts)
 # plt.show()
-
-train_data = data[:-44100]
+data_split = '2020-01-01'
+train_data = data[:-43920]
 test_data = data[-10000:]
 training_dataset_length = len(train_data)
 
@@ -177,10 +202,10 @@ def train_dddqn(env):
 
         def __init__(self, input_size, hidden_size, output_size):
             super(Q_Network, self).__init__(
-                fc1=L.Linear(input_size, hidden_size),
-                fc2=L.Linear(hidden_size, hidden_size),
-                fc3=L.Linear(hidden_size, hidden_size // 2),
-                fc4=L.Linear(hidden_size, hidden_size // 2),
+                fc1=L.LSTM(input_size, hidden_size),
+                fc2=L.LSTM(hidden_size, hidden_size),
+                fc3=L.LSTM(hidden_size, hidden_size // 2),
+                fc4=L.LSTM(hidden_size, hidden_size // 2),
                 state_value=L.Linear(hidden_size // 2, 1),
                 advantage_value=L.Linear(hidden_size // 2, output_size)
             )
@@ -203,7 +228,40 @@ def train_dddqn(env):
         def reset(self):
             self.zerograds()
 
-    """ >>> """
+    """ 
+        class Q_LSTM(nn.Module):
+
+        def __init__(self, input_dim, hidden_dim, num_layers, seq_length):
+            super(Q_LSTM, self).__init__()
+            self.input_dim = input_dim
+            self.hidden_dim = hidden_dim
+            self.num_layers = num_layers
+            self.seq_length = seq_length
+
+            # The LSTM takes word embeddings as inputs, and outputs hidden states
+            # with dimensionality hidden_dim.
+            self.lstm= nn.LSTM(input_dim, hidden_dim,dropout=0.2,num_layers=num_layers)
+
+            # The linear layer that maps from hidden state space to tag space
+            self.fc = nn.Linear(output_dim, tagset_size)
+
+            self.fc_1 = nn.Linear(hidden_size, 128)  # fully connected 1
+            self.fc = nn.Linear(128, num_classes)  # fully connected last layer
+
+        def forward(self, data_sequence):
+            h_0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_dim))  # hidden state
+            c_0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_dim))  # internal state
+            lstm_output,(hn,cn) = self.lstm(data_sequence, h_0, c_0)
+            hn = hn.view(-1,self.hidden_dim)
+            out = self.relu(hn)
+            out = self.fc_1(out)
+            out = self.relu(out)
+            out = self.fc(out)
+
+            return out
+    """
+
+
 
     Q = Q_Network(input_size=env.history_t + 1, hidden_size=100, output_size=3)
     Q_ast = copy.deepcopy(Q)
@@ -212,16 +270,16 @@ def train_dddqn(env):
 
     epoch_num = 50
     step_max = len(env.data) - 1
-    memory_size = 200
+    memory_size = 100
     batch_size = 50
     epsilon = 1.0
-    epsilon_decrease = 1e-3
+    epsilon_decrease = 1e-2
     epsilon_min = 0.1
     start_reduce_epsilon = 200
     train_freq = 10
-    update_q_freq = 20
+    update_q_freq = 1
     gamma = 0.97
-    show_log_freq = 5
+    show_log_freq = 1
 
     memory = []
     total_step = 0
