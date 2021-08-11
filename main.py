@@ -28,8 +28,7 @@ def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, input_shape,
     model.compile(optimizer=opt, loss='mae', metrics=['accuracy'])
     history = model.fit(x_train, y_train, validation_data=(x_test, y_test),
                         batch_size=batch_size, epochs=epochs, verbose=1)
-    # model.save(name_model)
-    # print("Saved model to disk")
+
 
     return model, history
 
