@@ -19,20 +19,13 @@ plt.close("all")
 def deep_network_LSTM(name_model, x_train, y_train, x_test, y_test, input_shape, activation_function='sigmoid', opt='adam',
                       epochs=100, batch_size=1024):
     model = Sequential()
-    model.add(LSTM(units=50, return_sequences=True, input_shape=input_shape))
-    model.add(Dropout(0.1))
-    model.add(LSTM(units=85, return_sequences=True))
-    model.add(Dropout(0.1))
-    model.add(LSTM(units=35, return_sequences=True))
-    model.add(Dropout(0.1))
-    model.add(LSTM(units=10))
-    model.add(Dropout(0.1))
-    model.add(Dense(units=1))
-    # Create callbacks
-    # callbacks = [EarlyStopping(monitor='val_loss', patience=5),
-    # ModelCheckpoint('../models/model.h5'), save_best_only=True,
-    # save_weights_only=False)]
-    model.compile(optimizer=opt, loss='mean_squared_error', metrics=['accuracy'])
+    model.add(LSTM(64, input_shape=(layers[1], layers[0]), return_sequences=True))
+    model.add(Dropout(0.3))
+    model.add(LSTM(64, input_shape=(layers[1], layers[0]), return_sequences=False))
+    model.add(Dropout(0.3))
+    model.add(Dense(32, kernel_initializer="uniform", activation='relu'))
+    model.add(Dense(1, kernel_initializer="uniform", activation='linear'))
+    model.compile(optimizer=opt, loss='mae', metrics=['accuracy'])
     history = model.fit(x_train, y_train, validation_data=(x_test, y_test),
                         batch_size=batch_size, epochs=epochs, verbose=1)
     # model.save(name_model)
